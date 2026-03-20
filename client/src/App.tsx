@@ -38,7 +38,6 @@ function App() {
       <div className="app-header">
         <h1>Vi-Notes Editor</h1>
 
-        {/* Theme toggle */}
         <label className="theme-switch">
           <input
             type="checkbox"
@@ -48,7 +47,6 @@ function App() {
           <span className="slider" />
         </label>
 
-        {/* Logout button */}
         {isAuth && (
           <button className="logout-btn" onClick={handleLogout}>
             Logout

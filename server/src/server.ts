@@ -14,7 +14,6 @@ mongoose.connect("mongodb://127.0.0.1:27017/vi-notes")
     console.log("MongoDB connected");
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
-      console.log("JWT_SECRET:", process.env.JWT_SECRET);
     });
   })
   .catch(console.error);

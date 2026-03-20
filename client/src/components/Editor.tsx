@@ -17,7 +17,7 @@ const Editor = () => {
     try {
       const token = localStorage.getItem("token");
 
-      console.log("TOKEN SENT:", token); // 🔍 debug
+      console.log("TOKEN SENT:", token);
 
       await axios.post(
         "http://localhost:5000/api/session",
@@ -27,7 +27,7 @@ const Editor = () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // ✅ FIXED
+            Authorization: `Bearer ${token}`,
           },
         }
       );

@@ -57,7 +57,6 @@ const Auth = ({ onAuth }: { onAuth: () => void }) => {
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        {/* Password with icon */}
         <div className="password-wrapper">
           <input
             type={showPassword ? "text" : "password"}
@@ -90,7 +89,6 @@ const Auth = ({ onAuth }: { onAuth: () => void }) => {
         </p>
       </div>
 
-      {/* Toast */}
       {toast && (
         <Toast
           message={toast.message}
