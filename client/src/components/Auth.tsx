@@ -80,7 +80,15 @@ const Auth = ({ onAuth }: { onAuth: () => void }) => {
         <p
           className="auth-toggle"
           onClick={() =>
-            setMode((prev) => (prev === "login" ? "register" : "login"))
+            setMode((prev) => {
+              const newMode = prev === "login" ? "register" : "login";
+
+              setEmail("");
+              setPassword("");
+              setShowPassword(false);
+
+              return newMode;
+            })
           }
         >
           {mode === "login"

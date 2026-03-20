@@ -46,19 +46,12 @@ const Editor = () => {
     }
   };
 
-  const handleInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
-    const el = e.currentTarget;
-    el.style.height = "auto";
-    el.style.height = el.scrollHeight + "px";
-  };
-
   return (
     <div className="editor-wrapper">
       <textarea
         placeholder="Start writing..."
         value={text}
         onChange={(e) => setText(e.target.value)}
-        onInput={handleInput}
         onKeyDown={handleKeyDown}
         onKeyUp={handleKeyUp}
         onPaste={logPaste}

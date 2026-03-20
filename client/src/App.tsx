@@ -8,7 +8,9 @@ function App() {
     const saved = localStorage.getItem("theme") as "dark" | "light" | null;
     if (saved) return saved;
 
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const prefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)",
+    ).matches;
     return prefersDark ? "dark" : "light";
   });
 
@@ -36,29 +38,33 @@ function App() {
   return (
     <div className="app">
       <div className="app-header">
-        <h1>Vi-Notes Editor</h1>
+        <div className="header-inner">
+          <div className="header-left">
+            <label className="theme-switch">
+              <input
+                type="checkbox"
+                checked={theme === "light"}
+                onChange={toggleTheme}
+              />
+              <span className="slider" />
+            </label>
+          </div>
 
-        <label className="theme-switch">
-          <input
-            type="checkbox"
-            checked={theme === "light"}
-            onChange={toggleTheme}
-          />
-          <span className="slider" />
-        </label>
+          <h1 className="header-title">Vi-Notes Editor</h1>
 
-        {isAuth && (
-          <button className="logout-btn" onClick={handleLogout}>
-            Logout
-          </button>
-        )}
+          <div className="header-right">
+            {isAuth && (
+              <button className="logout-btn" onClick={handleLogout}>
+                Logout
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
-      {!isAuth ? (
-        <Auth onAuth={() => setIsAuth(true)} />
-      ) : (
-        <Editor />
-      )}
+      <div className="app-content">
+        {!isAuth ? <Auth onAuth={() => setIsAuth(true)} /> : <Editor />}
+      </div>
     </div>
   );
 }

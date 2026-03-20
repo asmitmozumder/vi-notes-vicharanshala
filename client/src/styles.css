@@ -32,8 +32,6 @@
   --highlight: #cecacd;
 }
 
-
-
 html {
   font-size: 16px;
 }
@@ -43,70 +41,78 @@ body {
   background: var(--base);
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-
   height: 100vh;
   overflow: hidden;
 }
 
 .app {
-  max-width: 68rem;
-  margin: 0 auto;
-  padding: 2rem 1.5rem;
-
   height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
 .app-header {
-  position: relative;
-  text-align: center;
-  margin-bottom: 2rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
-.app-header h1 {
+.header-inner {
+  width: 100%;
+  max-width: 60rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 1rem;
+  box-sizing: border-box;
+
+  position: relative;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.header-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+
   font-size: 2rem;
   font-weight: 600;
+  margin: 0;
+
+  white-space: nowrap;
 }
 
-
-
-.theme-toggle {
-  margin-top: 1rem;
-  padding: 0.4rem 1rem;
-  font-size: 0.9rem;
-
-  border: 1px solid var(--border);
-  border-radius: 0.5rem;
-
-  background: var(--surface);
-  color: var(--text);
-
-  cursor: pointer;
+.header-right {
+  display: flex;
+  align-items: center;
 }
 
-.theme-toggle:hover {
-  background: var(--overlay);
+.app-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
 }
-
-
 
 .editor-wrapper {
+  width: 100%;
+  max-width: 60rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
-
-  width: 100%;
-  overflow: hidden;
+  gap: 1rem;
 }
 
 textarea {
   width: 100%;
-  max-width: 60rem;
-  min-width: 28rem;
-
-  min-height: 6rem;
-  max-height: 65vh;
+  height: calc(100vh - 16rem);
+  min-height: 12rem;
 
   background: var(--surface);
   color: var(--text);
@@ -123,9 +129,6 @@ textarea {
   overflow-y: auto;
 
   box-sizing: border-box;
-
-  transition: height 0.08s ease, border-color 0.2s ease;
-  will-change: height;
 }
 
 textarea::placeholder {
@@ -136,8 +139,6 @@ textarea:focus {
   outline: none;
   border-color: var(--primary);
 }
-
-
 
 textarea::-webkit-scrollbar {
   width: 0.6rem;
@@ -157,18 +158,13 @@ textarea::-webkit-scrollbar-thumb:hover {
   background: var(--primary);
 }
 
-/* Firefox */
 textarea {
   scrollbar-width: thin;
   scrollbar-color: var(--highlight) var(--base);
 }
 
-
-
 button {
-  margin-top: 1.25rem;
   padding: 0.65rem 1.4rem;
-
   font-size: 0.95rem;
   font-weight: 500;
 
@@ -186,14 +182,30 @@ button:hover {
   background: var(--accent);
 }
 
+.logout-btn {
+  padding: 0.4rem 0.9rem;
+  font-size: 0.8rem;
 
+  white-space: nowrap;
+
+  background: transparent;
+  color: var(--text);
+
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background: var(--overlay);
+}
 
 .theme-switch {
   position: relative;
   display: inline-block;
   width: 3.2rem;
   height: 1.7rem;
-  margin-top: 1rem;
 }
 
 .theme-switch input {
@@ -238,60 +250,11 @@ button:hover {
   background-color: var(--secondary);
 }
 
-.slider::before {
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
-}
-
-
-
-.toast {
-  position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
-
-  background: var(--surface);
-  color: var(--text);
-
-  padding: 0.75rem 1.25rem;
-
-  border-radius: 0.5rem;
-  border: 1px solid var(--border);
-
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-
-  font-size: 0.9rem;
-
-  animation: slideIn 0.3s ease;
-}
-
-.toast.success {
-  border-left: 4px solid var(--primary);
-}
-
-.toast.error {
-  border-left: 4px solid var(--accent);
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px) translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) translateX(0);
-  }
-}
-
-/* =========================
-   AUTH PAGE
-========================= */
-
 .auth-container {
-  flex: 1;
+  width: 100%;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 }
 
 .auth-box {
@@ -307,18 +270,14 @@ button:hover {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
-/* Title */
 .auth-box h2 {
   text-align: center;
   margin: 0;
   font-weight: 600;
 }
 
-/* Inputs */
 .auth-box input {
   padding: 0.7rem 0.9rem;
 
@@ -340,9 +299,6 @@ button:hover {
   border-color: var(--primary);
 }
 
-/* Button already styled globally */
-
-/* Toggle text */
 .auth-toggle {
   text-align: center;
   font-size: 0.85rem;
@@ -352,27 +308,6 @@ button:hover {
 
 .auth-toggle:hover {
   color: var(--primary);
-}
-
-.logout-btn {
-  position: absolute;
-  right: 2rem;
-  top: 2rem;
-
-  padding: 0.4rem 0.9rem;
-  font-size: 0.8rem;
-
-  background: transparent;
-  color: var(--text);
-
-  border: 1px solid var(--border);
-  border-radius: 0.4rem;
-
-  cursor: pointer;
-}
-
-.logout-btn:hover {
-  background: var(--overlay);
 }
 
 .password-wrapper {
@@ -395,10 +330,81 @@ button:hover {
   justify-content: center;
 
   cursor: pointer;
-
   color: var(--subtle);
 }
 
 .eye-toggle:hover {
   color: var(--primary);
+}
+
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+
+  background: var(--surface);
+  color: var(--text);
+
+  padding: 0.75rem 1.25rem;
+
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+
+  font-size: 0.9rem;
+}
+
+.toast.success {
+  border-left: 4px solid var(--primary);
+}
+
+.toast.error {
+  border-left: 4px solid var(--accent);
+}
+
+@media (max-width: 768px) {
+  .header-title {
+    font-size: 1.5rem;
+  }
+
+  .logout-btn {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.75rem;
+  }
+
+  textarea {
+    height: calc(100vh - 18rem);
+    font-size: 1rem;
+    padding: 1rem;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  .auth-box {
+    max-width: 90%;
+    padding: 1.5rem 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-title {
+    font-size: 1.3rem;
+  }
+
+  .logout-btn {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  textarea {
+    height: calc(100vh - 20rem);
+    font-size: 0.95rem;
+  }
+
+  .auth-box {
+    padding: 1.2rem 1rem;
+  }
 }
