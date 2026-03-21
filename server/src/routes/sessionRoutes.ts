@@ -1,10 +1,11 @@
 import express from "express";
-import { saveSession, getSessions, getSession } from "../controllers/sessionController.js";
+import { saveSession, updateSession, getSessions, getSession } from "../controllers/sessionController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 router.post("/", authMiddleware, saveSession);
+router.patch("/:id", authMiddleware, updateSession);
 router.get("/", authMiddleware, getSessions);
 router.get("/:id", authMiddleware, getSession);
 

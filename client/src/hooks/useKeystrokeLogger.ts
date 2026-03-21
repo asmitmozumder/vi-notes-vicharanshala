@@ -3,7 +3,6 @@ import type { Keystroke } from "../types/keystroke";
 
 export const useKeystrokeLogger = () => {
   const [keystrokes, setKeystrokes] = useState<Keystroke[]>([]);
-
   const downTimestamps = useRef<Map<string, number>>(new Map());
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -38,5 +37,12 @@ export const useKeystrokeLogger = () => {
     ]);
   };
 
-  return { keystrokes, handleKeyDown, handleKeyUp, logPaste };
+  // drains accumulated keystrokes and resets state for the next sync window
+  const flushKeystrokes = (): Keystroke[] => {
+    const pending = keystrokes;
+    setKeystrokes([]);
+    return pending;
+  };
+
+  return { keystrokes, handleKeyDown, handleKeyUp, logPaste, flushKeystrokes };
 };

@@ -28,6 +28,38 @@ export const saveSession = async (req: Request, res: Response) => {
   }
 };
 
+// append new keystrokes + overwrite content on the active session
+export const updateSession = async (req: Request, res: Response) => {
+  try {
+    if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
+
+    const { id } = req.params;
+    if (!id || Array.isArray(id)) {
+      return res.status(400).json({ error: "Invalid session id" });
+    }
+
+    const { content, keystrokes } = req.body;
+
+    const session = await Session.findOneAndUpdate(
+      { _id: new Types.ObjectId(id), user: new Types.ObjectId(req.userId) },
+      {
+        $set: { content },
+        $push: { keystrokes: { $each: keystrokes ?? [] } },
+      },
+      { new: true }
+    );
+
+    if (!session) {
+      return res.status(404).json({ error: "Session not found" });
+    }
+
+    res.json({ message: "Session updated" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to update session" });
+  }
+};
+
 export const getSessions = async (req: Request, res: Response) => {
   try {
     if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
@@ -48,7 +80,6 @@ export const getSession = async (req: Request, res: Response) => {
     if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
 
     const { id } = req.params;
-
     if (!id || Array.isArray(id)) {
       return res.status(400).json({ error: "Invalid session id" });
     }
