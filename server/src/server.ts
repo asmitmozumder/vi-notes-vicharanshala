@@ -7,13 +7,11 @@ dotenv.config({
 import app from "./app.js";
 import mongoose from "mongoose";
 
-const PORT = 5000;
-
-mongoose.connect("mongodb://127.0.0.1:27017/vi-notes")
+mongoose.connect(process.env.MONGODB_URI!)
   .then(() => {
     console.log("MongoDB connected");
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+    app.listen(process.env.PORT, () => {
+      console.log(`Server running on port ${process.env.PORT}`);
     });
   })
   .catch(console.error);
