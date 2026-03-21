@@ -1,5 +1,6 @@
 export interface Keystroke {
-  key: string;
-  timestamp: number;
   action: "down" | "up" | "paste";
+  timestamp: number;
+  duration?: number;
+  pasteLength?: number;
 }

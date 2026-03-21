@@ -54,7 +54,7 @@ const Editor = () => {
         onChange={(e) => setText(e.target.value)}
         onKeyDown={handleKeyDown}
         onKeyUp={handleKeyUp}
-        onPaste={logPaste}
+        onPaste={(e) => logPaste(e)}
       />
 
       <button onClick={handleSave}>Save</button>

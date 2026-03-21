@@ -1,30 +1,41 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { Keystroke } from "../types/keystroke";
 
 export const useKeystrokeLogger = () => {
   const [keystrokes, setKeystrokes] = useState<Keystroke[]>([]);
 
-  const logEvent = (key: string, action: "down" | "up" | "paste") => {
+  const downTimestamps = useRef<Map<string, number>>(new Map());
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    const now = Date.now();
+    downTimestamps.current.set(e.code, now);
+
     setKeystrokes((prev) => [
       ...prev,
-      {
-        key,
-        timestamp: Date.now(),
-        action,
-      },
+      { action: "down", timestamp: now },
     ]);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    logEvent(e.key, "down");
-  };
-
   const handleKeyUp = (e: React.KeyboardEvent) => {
-    logEvent(e.key, "up");
+    const now = Date.now();
+    const downAt = downTimestamps.current.get(e.code);
+    downTimestamps.current.delete(e.code);
+
+    const duration = downAt !== undefined ? now - downAt : undefined;
+
+    setKeystrokes((prev) => [
+      ...prev,
+      { action: "up", timestamp: now, ...(duration !== undefined && { duration }) },
+    ]);
   };
 
-  const logPaste = () => {
-    logEvent("PASTE", "paste");
+  const logPaste = (e: React.ClipboardEvent) => {
+    const pasteLength = e.clipboardData.getData("text").length;
+
+    setKeystrokes((prev) => [
+      ...prev,
+      { action: "paste", timestamp: Date.now(), pasteLength },
+    ]);
   };
 
   return { keystrokes, handleKeyDown, handleKeyUp, logPaste };
