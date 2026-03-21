@@ -1,16 +1,17 @@
 {
+  "name": "vi-notes",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "client",
+    "server"
+  ],
   "scripts": {
-    "dev": "concurrently \"cd server && npx tsx src/server.ts\" \"cd client && npm run dev\""
-  },
-  "devDependencies": {
-    "@types/bcrypt": "^6.0.0",
-    "@types/jsonwebtoken": "^9.0.10",
-    "concurrently": "^9.2.1"
+    "dev": "concurrently \"npm run dev -w server\" \"npm run dev -w client\"",
+    "build": "npm run build -w client"
   },
   "dependencies": {
-    "bcrypt": "^6.0.0",
-    "dotenv": "^17.3.1",
-    "jsonwebtoken": "^9.0.3",
-    "lucide-react": "^0.577.0"
+    "concurrently": "^9.2.1"
   }
 }
