@@ -37,7 +37,6 @@ export const useKeystrokeLogger = () => {
     ]);
   };
 
-  // drains accumulated keystrokes and resets state for the next sync window
   const flushKeystrokes = (): Keystroke[] => {
     const pending = keystrokes;
     setKeystrokes([]);

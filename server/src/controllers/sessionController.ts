@@ -28,7 +28,6 @@ export const saveSession = async (req: Request, res: Response) => {
   }
 };
 
-// append new keystrokes + overwrite content on the active session
 export const updateSession = async (req: Request, res: Response) => {
   try {
     if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
