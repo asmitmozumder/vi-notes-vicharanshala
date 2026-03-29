@@ -24,13 +24,11 @@ const Editor = ({ existingSessionId, initialContent, initialTitle, onBack }: Edi
   const { handleKeyDown, handleKeyUp, logPaste, flushKeystrokes } =
     useKeystrokeLogger();
 
-  // session id for this writing session - may be pre-existing or created on first keystroke
   const sessionIdRef = useRef<string | null>(existingSessionId);
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const getToken = () => localStorage.getItem("token");
 
-  // creates a session if one doesn't exist yet (keystroke-only, content is empty string)
   const ensureSession = useCallback(async () => {
     if (sessionIdRef.current) return sessionIdRef.current;
 
@@ -44,7 +42,6 @@ const Editor = ({ existingSessionId, initialContent, initialTitle, onBack }: Edi
     return sessionIdRef.current;
   }, []);
 
-  // flushes pending keystrokes to the server — does NOT save content
   const syncKeystrokes = useCallback(async (pendingKeystrokes: ReturnType<typeof flushKeystrokes>) => {
     if (pendingKeystrokes.length === 0) return;
 
@@ -82,14 +79,12 @@ const Editor = ({ existingSessionId, initialContent, initialTitle, onBack }: Edi
     scheduleKeystrokeSync();
   };
 
-  // saves content explicitly when the user clicks Save
   const handleSave = async () => {
     setSaving(true);
     try {
       const id = await ensureSession();
       if (!id) throw new Error("No session");
 
-      // flush any remaining keystrokes along with the content save
       const pending = flushKeystrokes();
       if (debounceTimer.current) clearTimeout(debounceTimer.current);
 

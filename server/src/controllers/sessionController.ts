@@ -2,7 +2,6 @@ import type { Request, Response } from "express";
 import { Types } from "mongoose";
 import Session from "../models/Session.js";
 
-// creates a session — content can be empty string on initial keystroke-only create
 export const saveSession = async (req: Request, res: Response) => {
   try {
     const { content, keystrokes, title } = req.body;
@@ -30,7 +29,6 @@ export const saveSession = async (req: Request, res: Response) => {
   }
 };
 
-// patches a session — content is optional (keystroke-only syncs omit it)
 export const updateSession = async (req: Request, res: Response) => {
   try {
     if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
@@ -46,7 +44,6 @@ export const updateSession = async (req: Request, res: Response) => {
       $push: { keystrokes: { $each: keystrokes ?? [] } },
     };
 
-    // only overwrite content/title if explicitly provided
     const setFields: Record<string, unknown> = {};
     if (typeof content === "string") setFields.content = content;
     if (typeof title === "string") setFields.title = title;
@@ -69,7 +66,6 @@ export const updateSession = async (req: Request, res: Response) => {
   }
 };
 
-// list all sessions for the authed user, newest first
 export const getSessions = async (req: Request, res: Response) => {
   try {
     if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
@@ -85,7 +81,6 @@ export const getSessions = async (req: Request, res: Response) => {
   }
 };
 
-// single session by id, scoped to the authed user
 export const getSession = async (req: Request, res: Response) => {
   try {
     if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
