@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import axios from "axios";
+const API_URL = import.meta.env.SERVER_API_URL ?? "http://localhost:5000";
 import { useKeystrokeLogger } from "../hooks/useKeystrokeLogger";
 import Toast from "./Toast";
 
@@ -33,7 +34,7 @@ const Editor = ({ existingSessionId, initialContent, initialTitle, onBack }: Edi
     if (sessionIdRef.current) return sessionIdRef.current;
 
     const res = await axios.post(
-      "http://localhost:5000/api/session",
+      `${API_URL}/api/session`,
       { content: "", keystrokes: [], title: "" },
       { headers: { Authorization: `Bearer ${getToken()}` } }
     );
@@ -50,7 +51,7 @@ const Editor = ({ existingSessionId, initialContent, initialTitle, onBack }: Edi
       if (!id) return;
 
       await axios.patch(
-        `http://localhost:5000/api/session/${id}`,
+        `${API_URL}/api/session/${id}`,
         { keystrokes: pendingKeystrokes },
         { headers: { Authorization: `Bearer ${getToken()}` } }
       );
@@ -89,7 +90,7 @@ const Editor = ({ existingSessionId, initialContent, initialTitle, onBack }: Edi
       if (debounceTimer.current) clearTimeout(debounceTimer.current);
 
       await axios.patch(
-        `http://localhost:5000/api/session/${id}`,
+        `${API_URL}/api/session/${id}`,
         { content: text, keystrokes: pending, title },
         { headers: { Authorization: `Bearer ${getToken()}` } }
       );

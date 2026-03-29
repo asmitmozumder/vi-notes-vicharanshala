@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+const API_URL = import.meta.env.SERVER_API_URL ?? "http://localhost:5000";
 
 interface Session {
   _id: string;
@@ -22,7 +23,7 @@ const Home = ({ onOpen, onNew }: HomeProps) => {
   useEffect(() => {
     const fetchSessions = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/session", {
+        const res = await axios.get(`${API_URL}/api/session`, {
           headers: { Authorization: `Bearer ${getToken()}` },
         });
         setSessions(res.data);

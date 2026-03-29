@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+const API_URL = import.meta.env.SERVER_API_URL ?? "http://localhost:5000";
 import { Eye, EyeOff } from "lucide-react";
 import Toast from "./Toast";
 
@@ -16,7 +17,7 @@ const Auth = ({ onAuth }: { onAuth: () => void }) => {
 
   const handleSubmit = async () => {
     try {
-      const res = await axios.post(`http://localhost:5000/api/auth/${mode}`, {
+      const res = await axios.post(`${API_URL}/api/auth/${mode}`, {
         email,
         password,
       });
