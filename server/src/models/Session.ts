@@ -9,7 +9,8 @@ const KeystrokeSchema = new mongoose.Schema({
 
 const SessionSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  content: { type: String, required: true },
+  title: { type: String, default: "" },
+  content: { type: String, default: "" },
   keystrokes: [KeystrokeSchema],
   createdAt: { type: Date, default: Date.now },
 });

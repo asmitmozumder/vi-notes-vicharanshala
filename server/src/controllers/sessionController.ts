@@ -2,12 +2,13 @@ import type { Request, Response } from "express";
 import { Types } from "mongoose";
 import Session from "../models/Session.js";
 
+// creates a session — content can be empty string on initial keystroke-only create
 export const saveSession = async (req: Request, res: Response) => {
   try {
-    const { content, keystrokes } = req.body;
+    const { content, keystrokes, title } = req.body;
 
-    if (typeof content !== "string" || content.trim() === "") {
-      return res.status(400).json({ error: "content is required" });
+    if (typeof content !== "string") {
+      return res.status(400).json({ error: "content must be a string" });
     }
 
     if (!Array.isArray(keystrokes)) {
@@ -16,6 +17,7 @@ export const saveSession = async (req: Request, res: Response) => {
 
     const session = new Session({
       user: new Types.ObjectId(req.userId),
+      title: typeof title === "string" ? title : "",
       content,
       keystrokes,
     });
@@ -28,6 +30,7 @@ export const saveSession = async (req: Request, res: Response) => {
   }
 };
 
+// patches a session — content is optional (keystroke-only syncs omit it)
 export const updateSession = async (req: Request, res: Response) => {
   try {
     if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
@@ -37,15 +40,22 @@ export const updateSession = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Invalid session id" });
     }
 
-    const { content, keystrokes } = req.body;
+    const { content, keystrokes, title } = req.body;
+
+    const update: Record<string, unknown> = {
+      $push: { keystrokes: { $each: keystrokes ?? [] } },
+    };
+
+    // only overwrite content/title if explicitly provided
+    const setFields: Record<string, unknown> = {};
+    if (typeof content === "string") setFields.content = content;
+    if (typeof title === "string") setFields.title = title;
+    if (Object.keys(setFields).length > 0) update.$set = setFields;
 
     const session = await Session.findOneAndUpdate(
       { _id: new Types.ObjectId(id), user: new Types.ObjectId(req.userId) },
-      {
-        $set: { content },
-        $push: { keystrokes: { $each: keystrokes ?? [] } },
-      },
-      { new: true }
+      update,
+      { returnDocument: "after" }
     );
 
     if (!session) {
@@ -59,13 +69,14 @@ export const updateSession = async (req: Request, res: Response) => {
   }
 };
 
+// list all sessions for the authed user, newest first
 export const getSessions = async (req: Request, res: Response) => {
   try {
     if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
 
     const sessions = await Session.find({ user: new Types.ObjectId(req.userId) })
       .sort({ createdAt: -1 })
-      .select("-__v");
+      .select("-__v -keystrokes");
 
     res.json(sessions);
   } catch (error) {
@@ -74,6 +85,7 @@ export const getSessions = async (req: Request, res: Response) => {
   }
 };
 
+// single session by id, scoped to the authed user
 export const getSession = async (req: Request, res: Response) => {
   try {
     if (!req.userId) return res.status(401).json({ error: "Unauthorized" });

@@ -5,8 +5,17 @@ import Toast from "./Toast";
 
 const DEBOUNCE_MS = 500;
 
-const Editor = () => {
-  const [text, setText] = useState("");
+interface EditorProps {
+  existingSessionId: string | null;
+  initialContent: string;
+  initialTitle: string;
+  onBack: () => void;
+}
+
+const Editor = ({ existingSessionId, initialContent, initialTitle, onBack }: EditorProps) => {
+  const [text, setText] = useState(initialContent);
+  const [title, setTitle] = useState(initialTitle);
+  const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
@@ -15,17 +24,19 @@ const Editor = () => {
   const { handleKeyDown, handleKeyUp, logPaste, flushKeystrokes } =
     useKeystrokeLogger();
 
-  const sessionIdRef = useRef<string | null>(null);
+  // session id for this writing session - may be pre-existing or created on first keystroke
+  const sessionIdRef = useRef<string | null>(existingSessionId);
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const getToken = () => localStorage.getItem("token");
 
-  const ensureSession = useCallback(async (content: string, initialKeystrokes: ReturnType<typeof flushKeystrokes>) => {
+  // creates a session if one doesn't exist yet (keystroke-only, content is empty string)
+  const ensureSession = useCallback(async () => {
     if (sessionIdRef.current) return sessionIdRef.current;
 
     const res = await axios.post(
       "http://localhost:5000/api/session",
-      { content, keystrokes: initialKeystrokes },
+      { content: "", keystrokes: [], title: "" },
       { headers: { Authorization: `Bearer ${getToken()}` } }
     );
 
@@ -33,31 +44,32 @@ const Editor = () => {
     return sessionIdRef.current;
   }, []);
 
-  const syncToServer = useCallback(async (content: string, pendingKeystrokes: ReturnType<typeof flushKeystrokes>) => {
-    try {
-      const id = await ensureSession(content, pendingKeystrokes);
+  // flushes pending keystrokes to the server — does NOT save content
+  const syncKeystrokes = useCallback(async (pendingKeystrokes: ReturnType<typeof flushKeystrokes>) => {
+    if (pendingKeystrokes.length === 0) return;
 
-      if (id && sessionIdRef.current) {
-        await axios.patch(
-          `http://localhost:5000/api/session/${id}`,
-          { content, keystrokes: pendingKeystrokes },
-          { headers: { Authorization: `Bearer ${getToken()}` } }
-        );
-      }
+    try {
+      const id = await ensureSession();
+      if (!id) return;
+
+      await axios.patch(
+        `http://localhost:5000/api/session/${id}`,
+        { keystrokes: pendingKeystrokes },
+        { headers: { Authorization: `Bearer ${getToken()}` } }
+      );
     } catch (err) {
-      console.error(err);
-      setToast({ message: "Failed to sync session.", type: "error" });
+      console.error("Keystroke sync failed", err);
     }
   }, [ensureSession]);
 
-  const scheduleSync = useCallback((content: string) => {
+  const scheduleKeystrokeSync = useCallback(() => {
     if (debounceTimer.current) clearTimeout(debounceTimer.current);
 
     debounceTimer.current = setTimeout(() => {
       const pending = flushKeystrokes();
-      syncToServer(content, pending);
+      syncKeystrokes(pending);
     }, DEBOUNCE_MS);
-  }, [flushKeystrokes, syncToServer]);
+  }, [flushKeystrokes, syncKeystrokes]);
 
   useEffect(() => {
     return () => {
@@ -66,24 +78,69 @@ const Editor = () => {
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
-    setText(value);
-    scheduleSync(value);
+    setText(e.target.value);
+    scheduleKeystrokeSync();
+  };
+
+  // saves content explicitly when the user clicks Save
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const id = await ensureSession();
+      if (!id) throw new Error("No session");
+
+      // flush any remaining keystrokes along with the content save
+      const pending = flushKeystrokes();
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+
+      await axios.patch(
+        `http://localhost:5000/api/session/${id}`,
+        { content: text, keystrokes: pending, title },
+        { headers: { Authorization: `Bearer ${getToken()}` } }
+      );
+
+      setToast({ message: "Saved.", type: "success" });
+    } catch (err) {
+      console.error(err);
+      setToast({ message: "Failed to save.", type: "error" });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
     <div className="editor-wrapper">
+      <div className="editor-topbar">
+        <input
+          className="title-input"
+          type="text"
+          placeholder="Untitled session"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          maxLength={120}
+        />
+        <button className="back-btn" onClick={onBack}>
+          Back ←
+        </button>
+      </div>
+
       <textarea
-        placeholder="Start writing..."
+        placeholder="Start writing…"
         value={text}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         onKeyUp={handleKeyUp}
         onPaste={(e) => {
           logPaste(e);
-          scheduleSync(text);
+          scheduleKeystrokeSync();
         }}
       />
+
+      <div className="editor-footer">
+        <button className="save-btn" onClick={handleSave} disabled={saving}>
+          {saving ? "Saving…" : "Save"}
+        </button>
+      </div>
 
       {toast && (
         <Toast
